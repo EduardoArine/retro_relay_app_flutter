@@ -9,7 +9,7 @@
 
 ```
 lib/
-  main.dart               # ProviderScope + init SharedPreferences
+  main.dart               # entry point — ProviderScope envolve o app
   app/                    # widget raiz, rotas, tema
   core/                   # infraestrutura compartilhada — sem features aqui
     constants/            # só const — sem lógica
@@ -27,41 +27,65 @@ Nova dependência → justifique antes de adicionar.
 
 ---
 
+## Convenções de nomenclatura
+
+| Elemento | Padrão | Exemplo |
+|---|---|---|
+| Arquivos Dart | `snake_case` | `canal_notifier.dart` |
+| Classes | `PascalCase` | `CanaisNotifier` |
+| Providers | sufixo `Provider` | `canaisProvider` |
+| Notifiers | sufixo `Notifier` | `CanaisNotifier` |
+| Services | sufixo `Service` | `RelayApiService` |
+| Repositories | sufixo `Repository` | `ConsoleRepository` |
+| Screens | sufixo `Screen` | `HomeScreen` |
+| Widgets shared | nome descritivo sem sufixo | `ConsoleCard`, `AppHeader` |
+
+---
+
 ## Contratos que não se quebram
 
 | Regra | Motivo |
 |---|---|
 | UI não acessa Dio | Fluxo: Screen → Notifier → Repository → Service |
 | `core/` não importa `features/` | Evita acoplamento circular |
-| Feature não importa outra feature | Isolamento — exceto se documentado |
+| Feature não importa `data/` ou `models/` de outra feature | Evita acoplamento de implementação |
+| Feature pode usar provider de outra feature via `ref.watch/read` | Provider é a interface pública entre features |
+| Dependência entre features deve ser documentada no README | Rastreabilidade — quem depende de quem |
 | `shared/widgets/` só para 2+ features | Evita over-sharing prematuro |
 | Models imutáveis com `copyWith` | Compatibilidade com Riverpod |
 | IP do ESP32 como parâmetro no service | IP muda em runtime (mDNS / config) |
-| `sharedPreferencesProvider` declarado em `prefs_service.dart` | Override em `main.dart` — não importar `main` de features |
 
 ---
 
-## Antes de alterar estrutura
+## Controle de escopo por etapa
 
-Se a mudança envolve:
-- nova pasta de feature
-- nova camada (ex: usecases)
-- nova dependência
-- refactor cross-feature
+Antes de gerar código, liste os arquivos que serão criados ou alterados.
+Não crie mais de ~5 arquivos sem confirmação explícita.
+Prefira entregas pequenas e verificáveis — stubs compiláveis > implementação parcial.
 
-→ **Explique o impacto e aguarde confirmação antes de criar código.**
+Alterações que exigem explicação de impacto **antes** de qualquer código:
+- nova pasta de feature ou subpasta estrutural
+- nova camada (ex: usecases, domain, entities)
+- nova dependência externa
+- refactor que toca mais de uma feature
 
 ---
 
-## Ao criar novos arquivos
+## Atualização de documentação
 
-- Nova feature → README em `features/{feature}/README.md`
-- Nova subpasta estrutural → README ou nota no README pai
-- Não criar README onde já existe — atualizar o existente
+| Evento | Ação obrigatória |
+|---|---|
+| Nova feature criada | Criar `features/{feature}/README.md` |
+| Nova regra arquitetural | Atualizar seção relevante neste arquivo |
+| Nova subpasta estrutural | README ou nota no README da pasta pai |
+| README já existe | Atualizar — nunca duplicar |
+| Arquivo órfão removido | Registrar motivo no commit ou no README da feature |
 
 ---
 
 ## Fases — status atual
+
+> ✅ = código existe, compila e foi revisado. ⬜ = não iniciado. 🔄 = em andamento.
 
 | # | Conteúdo | Status |
 |---|---|---|

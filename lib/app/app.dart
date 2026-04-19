@@ -1,23 +1,14 @@
-// Widget raiz do app.
-//
-// Responsabilidades:
-//   - Conectar tema (theme.dart) e navegação (routes.dart)
-//   - Ser o ponto de montagem do MaterialApp
-//
-// Não contém lógica de negócio. Se no futuro precisar reagir a estado global
-// (ex: tema dinâmico, locale), use ref.watch aqui.
-
+// Widget raiz. Conecta tema e roteamento. Sem lógica de negócio.
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'routes.dart';
 import 'theme.dart';
 
-class RetroRelayApp extends ConsumerWidget {
+class RetroRelayApp extends StatelessWidget {
   const RetroRelayApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Retro Relay',
       debugShowCheckedModeBanner: false,
