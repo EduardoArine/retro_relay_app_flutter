@@ -95,7 +95,7 @@ Alterações que exigem explicação de impacto **antes** de qualquer código:
 | 4 | Conectividade: `conectadoProvider` (StreamProvider, poll 15 s) | ✅ |
 | 5 | Shared widgets: ConsoleCard, ConsoleGrid, AppBottomNavBar, Header | ✅ |
 | 6 | Telas completas: Home, Cadastro, NovoConsole, Config | ✅ |
-| 7 | Voz: `speech_to_text` + VoiceControlNotifier | ⬜ |
+| 7 | Voz: `speech_to_text` + VoiceControlNotifier | ✅ |
 | 8 | mDNS: `multicast_dns` + MdnsService | ⬜ |
 
 Não avance de fase sem sinal explícito.
