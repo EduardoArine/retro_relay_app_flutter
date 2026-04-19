@@ -18,17 +18,34 @@ class HomeScreen extends ConsumerWidget {
     final consoles = ref.watch(consolesProvider);
     final conectado = ref.watch(conectadoProvider).valueOrNull ?? false;
 
+    final canaisConfigurados =
+        canais.where((c) => consoles.containsKey(c.index)).toList();
+
     return Scaffold(
       appBar: AppHeader(
         title: 'Retro Relay',
         showMicButton: true,
         onMicTap: () => Navigator.pushNamed(context, AppRoutes.voiceControl),
       ),
-      body: ConsoleGrid(
-        canais: canais,
-        consoles: consoles,
-        onToggle: (index) => ref.read(canaisProvider.notifier).toggleCanal(index),
-      ),
+      body: canaisConfigurados.isEmpty
+          ? Center(
+              child: Text(
+                'Nenhum console cadastrado.\nAcesse "Meus Consoles" para configurar.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.5),
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            )
+          : ConsoleGrid(
+              canais: canaisConfigurados,
+              consoles: consoles,
+              onToggle: (index) =>
+                  ref.read(canaisProvider.notifier).toggleCanal(index),
+            ),
       bottomNavigationBar: AppBottomNavBar(
         selectedIndex: 0,
         conectado: conectado,

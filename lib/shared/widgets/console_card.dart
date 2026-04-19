@@ -56,11 +56,13 @@ class ConsoleCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
               child: Text(
-                canal.isEmpty ? 'Slot ${canal.index + 1}' : canal.nome,
+                config?.nome.isNotEmpty == true
+                    ? config!.nome
+                    : 'Slot ${canal.index + 1}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: canal.isEmpty
-                          ? colorScheme.onSurface.withValues(alpha: 0.4)
-                          : colorScheme.onSurface,
+                      color: config?.nome.isNotEmpty == true
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

@@ -31,7 +31,7 @@ class CanaisNotifier extends Notifier<List<Canal>> {
   List<Canal> build() {
     return List.generate(
       AppConstants.totalCanais,
-      (i) => Canal(index: i, nome: AppConstants.defaultCanalNames[i]),
+      (i) => Canal(index: i, nome: ''),
     );
   }
 
