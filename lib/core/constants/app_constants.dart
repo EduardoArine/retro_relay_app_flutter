@@ -46,27 +46,43 @@ abstract final class AppConstants {
 
   // ─── CDN de imagens ──────────────────────────────────────────────────────
   static const String cdnBaseUrl =
-      'https://raw.githubusercontent.com/EduardoArine/retro-relay-images/main/';
+      'https://raw.githubusercontent.com/EduardoArine/retro-relay-images/refs/heads/main/';
 
-  /// Nomes dos arquivos de imagem disponíveis no repositório CDN.
-  /// Verifique os nomes reais em: github.com/EduardoArine/retro-relay-images
   static const List<String> cdnImageNames = [
-    'super-nintendo.png',
-    'mega-drive.png',
-    'playstation.png',
-    'nintendo-64.png',
-    'saturn.png',
-    'dreamcast.png',
-    'gamecube.png',
-    'atari-2600.png',
-    'master-system.png',
-    'game-boy.png',
-    'game-boy-advance.png',
-    'neo-geo.png',
+    // Atari
+    'atari_2600.png',
+    // Nintendo
+    'nes.png',
+    'snes.png',
+    'n64.png',
+    'game_cube.png',
+    'nintendo_wii.png',
+    'nintendo_switch.png',
+    // Sega
+    'master_system.png',
+    'mega_drive.png',
+    'sega_saturn.png',
+    'sega_dreamcast.png',
+    // Sony PlayStation
+    'ps1.png',
     'ps2.png',
+    'ps3.png',
+    'ps4.png',
+    'ps5.png',
+    // Microsoft Xbox
     'xbox.png',
-    'nintendo-ds.png',
-    'psp.png',
+    'xbox_360.png',
+    'xbox_one.png',
+    'xbox_series_s.png',
+    'xbox_series_x.png',
+    // SNK Neo Geo
+    'neogeo.png',
+    'neogeo_cd.png',
+    // PC Engine / TurboGrafx
+    'pc_engine.png',
+    'turbo_grafx.png',
+    // 3DO
+    '3do.png',
   ];
 
   static String cdnImageUrl(String fileName) => '$cdnBaseUrl$fileName';
