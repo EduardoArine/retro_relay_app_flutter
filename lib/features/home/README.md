@@ -41,8 +41,11 @@ Canal(index: 0, nome: 'Super Nintendo', ativo: false)
 
 **Após toggle:** estado local atualizado imediatamente (otimista), chamada HTTP ao ESP32 em background.
 
-## Dependências
+## Dependências cross-feature (por provider — permitido pelas regras do projeto)
 
-- `RelayApiService` — para `toggleCanal()` e `setModo()`
-- `ConsoleRepository` — para exibir imagem e nome dos consoles cadastrados
-- `settingsProvider` — para ler IP e modoUnico atual
+| Provider externo | Feature de origem | Como é usado |
+|---|---|---|
+| `settingsProvider` | `config` | IP e modoUnico lidos via `ref.read` em cada toggle |
+| `consolesProvider` | `novo_console` | Grid exibe imagem e nome de cada canal via `ref.watch` |
+
+Acesso direto a `data/` ou `models/` de outras features **não é permitido**.
