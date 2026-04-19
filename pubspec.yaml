@@ -38,6 +38,7 @@ dependencies:
   dio: ^5.7.0
   shared_preferences: ^2.3.1
   speech_to_text: ^7.0.0
+  multicast_dns: ^0.3.3
 
 dev_dependencies:
   flutter_test:

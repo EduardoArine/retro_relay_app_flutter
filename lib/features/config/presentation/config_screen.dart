@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/routes.dart';
+import '../../../core/network/mdns_service.dart';
 import '../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../shared/widgets/app_header.dart';
 import '../../config/data/connectivity_provider.dart';
@@ -17,6 +18,7 @@ class ConfigScreen extends ConsumerStatefulWidget {
 
 class _ConfigScreenState extends ConsumerState<ConfigScreen> {
   late final TextEditingController _ipController;
+  bool _buscando = false;
 
   @override
   void initState() {
@@ -29,6 +31,22 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
   void dispose() {
     _ipController.dispose();
     super.dispose();
+  }
+
+  Future<void> _buscarNaRede() async {
+    setState(() => _buscando = true);
+    final ip = await ref.read(mdnsServiceProvider).discover();
+    if (!mounted) return;
+    setState(() => _buscando = false);
+
+    if (ip != null) {
+      _ipController.text = ip;
+      await _salvarIp();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Dispositivo não encontrado na rede')),
+      );
+    }
   }
 
   Future<void> _salvarIp() async {
@@ -100,6 +118,21 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: conectado ? Colors.green : Colors.red,
                     ),
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: _buscando ? null : _buscarNaRede,
+                icon: _buscando
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.search, size: 16),
+                label: const Text('Buscar na rede'),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
               ),
             ],
           ),

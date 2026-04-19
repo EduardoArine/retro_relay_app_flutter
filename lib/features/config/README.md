@@ -15,10 +15,10 @@ config/
   data/
     prefs_service.dart      # Leitura/escrita no SharedPreferences
     config_repository.dart  # Ponte entre PrefsService e os notifiers
-    mdns_service.dart       # (Fase 8) Descoberta automática via multicast_dns
+    connectivity_provider.dart  # StreamProvider<bool> poll 15 s via /ping
   presentation/
-    config_screen.dart      # UI: campos IP, toggle modo, botão mDNS
-    config_notifier.dart    # (Fase 6) SettingsNotifier: carrega e salva AppSettings
+    config_screen.dart      # UI: campos IP, toggle modo, botão "Buscar na rede"
+    config_notifier.dart    # SettingsNotifier: carrega e salva AppSettings
 ```
 
 ## Model principal: `AppSettings`
@@ -47,7 +47,15 @@ Qualquer provider que precisar de `SharedPreferences` deve usar:
 final prefs = ref.read(sharedPreferencesProvider);
 ```
 
-## Fase futura: mDNS
+## mDNS — descoberta automática
 
-`MdnsService` usará o package `multicast_dns` para descobrir o ESP32 na rede local.
-Ao encontrar, atualizará o IP via `SettingsNotifier.updateIp()`.
+`MdnsService` (em `core/network/mdns_service.dart`) descobre o ESP32 na rede local.
+
+Estratégia em duas etapas:
+1. Resolve `retro-relay.local` via `IPAddressResourceRecord` (hostname direto)
+2. Fallback: busca serviços `_http._tcp` via `PtrResourceRecord` → `SrvResourceRecord` → IP
+
+O botão "Buscar na rede" em `ConfigScreen` chama `MdnsService.discover()`, preenche o
+campo IP e chama `_salvarIp()` automaticamente se encontrar.
+
+Timeout padrão: 5 s para hostname, 2 s por etapa do fallback.
