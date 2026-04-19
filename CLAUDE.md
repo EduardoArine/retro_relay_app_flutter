@@ -93,7 +93,7 @@ Alterações que exigem explicação de impacto **antes** de qualquer código:
 | 2 | Models + Storage: Canal, ConsoleConfig, AppSettings, prefs, storage | ✅ |
 | 3 | Providers + Notifiers: SettingsNotifier, CanaisNotifier, ConsolesNotifier | ✅ |
 | 4 | Conectividade: `conectadoProvider` (StreamProvider, poll 15 s) | ✅ |
-| 5 | Shared widgets: ConsoleCard, ConsoleGrid, AppBottomNavBar, Header | ⬜ |
+| 5 | Shared widgets: ConsoleCard, ConsoleGrid, AppBottomNavBar, Header | ✅ |
 | 6 | Telas completas: Home, Cadastro, NovoConsole, Config | ⬜ |
 | 7 | Voz: `speech_to_text` + VoiceControlNotifier | ⬜ |
 | 8 | mDNS: `multicast_dns` + MdnsService | ⬜ |
