@@ -19,5 +19,5 @@ class AuthService {
 }
 
 final authServiceProvider = Provider<AuthService>((ref) {
-  return AuthService(ref.read(apiClientProvider));
+  return AuthService(ref.read(dioProvider));
 });

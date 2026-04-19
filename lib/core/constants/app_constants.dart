@@ -47,4 +47,27 @@ abstract final class AppConstants {
   // ─── CDN de imagens ──────────────────────────────────────────────────────
   static const String cdnBaseUrl =
       'https://raw.githubusercontent.com/EduardoArine/retro-relay-images/main/';
+
+  /// Nomes dos arquivos de imagem disponíveis no repositório CDN.
+  /// Verifique os nomes reais em: github.com/EduardoArine/retro-relay-images
+  static const List<String> cdnImageNames = [
+    'super-nintendo.png',
+    'mega-drive.png',
+    'playstation.png',
+    'nintendo-64.png',
+    'saturn.png',
+    'dreamcast.png',
+    'gamecube.png',
+    'atari-2600.png',
+    'master-system.png',
+    'game-boy.png',
+    'game-boy-advance.png',
+    'neo-geo.png',
+    'ps2.png',
+    'xbox.png',
+    'nintendo-ds.png',
+    'psp.png',
+  ];
+
+  static String cdnImageUrl(String fileName) => '$cdnBaseUrl$fileName';
 }

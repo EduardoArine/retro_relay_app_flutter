@@ -74,7 +74,7 @@ class ConsoleCard extends StatelessWidget {
   }
 
   Widget _buildImage(ColorScheme colorScheme) {
-    if (config == null) {
+    if (config == null || config!.imagem.isEmpty) {
       return Icon(
         Icons.videogame_asset_outlined,
         size: 40,

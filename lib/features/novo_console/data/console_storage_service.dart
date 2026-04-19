@@ -33,7 +33,7 @@ class ConsoleStorageService {
 
   const ConsoleStorageService(this._prefs);
 
-  /// Carrega todos os consoles salvos como Map<canalIndex, ConsoleConfig>.
+  /// Carrega todos os consoles salvos como `Map<canalIndex, ConsoleConfig>`.
   /// Retorna mapa vazio se não houver dados ou se houver erro de parsing.
   Map<int, ConsoleConfig> loadAll() {
     final raw = _prefs.getString(AppConstants.prefsKeyConsoles);

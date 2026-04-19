@@ -1,51 +1,44 @@
-// Tela principal do app — exibe o grid de consoles e seus toggles.
-// STUB: implementação completa na Fase 6 (widgets + CanaisNotifier).
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../app/routes.dart';
+import '../../../shared/widgets/app_bottom_nav_bar.dart';
+import '../../../shared/widgets/app_header.dart';
+import '../../../shared/widgets/console_grid.dart';
+import '../../config/data/connectivity_provider.dart';
+import '../../novo_console/presentation/novo_console_notifier.dart';
+import '../presentation/home_notifier.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final canais = ref.watch(canaisProvider);
+    final consoles = ref.watch(consolesProvider);
+    final conectado = ref.watch(conectadoProvider).valueOrNull ?? false;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Retro Relay'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mic),
-            tooltip: 'Controle por voz',
-            onPressed: () =>
-                Navigator.pushNamed(context, AppRoutes.voiceControl),
-          ),
-        ],
+      appBar: AppHeader(
+        title: 'Retro Relay',
+        showMicButton: true,
+        onMicTap: () => Navigator.pushNamed(context, AppRoutes.voiceControl),
       ),
-      body: const Center(
-        child: Text('HomeScreen — em construção'),
+      body: ConsoleGrid(
+        canais: canais,
+        consoles: consoles,
+        onToggle: (index) => ref.read(canaisProvider.notifier).toggleCanal(index),
       ),
-      bottomNavigationBar: _BottomNav(current: 0),
+      bottomNavigationBar: AppBottomNavBar(
+        selectedIndex: 0,
+        conectado: conectado,
+        onTap: (i) => _onNavTap(context, i),
+      ),
     );
   }
-}
 
-class _BottomNav extends StatelessWidget {
-  final int current;
-  const _BottomNav({required this.current});
-
-  @override
-  Widget build(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: current,
-      onDestinationSelected: (i) {
-        final routes = [AppRoutes.home, AppRoutes.cadastro, AppRoutes.config];
-        Navigator.pushReplacementNamed(context, routes[i]);
-      },
-      destinations: const [
-        NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-        NavigationDestination(icon: Icon(Icons.list), label: 'Cadastro'),
-        NavigationDestination(icon: Icon(Icons.settings), label: 'Config'),
-      ],
-    );
+  void _onNavTap(BuildContext context, int index) {
+    const routes = [AppRoutes.home, AppRoutes.cadastro, AppRoutes.config];
+    if (index != 0) Navigator.pushReplacementNamed(context, routes[index]);
   }
 }
