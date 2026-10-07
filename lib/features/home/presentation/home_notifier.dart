@@ -16,10 +16,12 @@
 //   sem reconstrução reativa da lista de canais quando o IP muda.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:home_widget/home_widget.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/network/relay_api_service.dart';
 import '../../config/presentation/config_notifier.dart';
+import '../../novo_console/presentation/novo_console_notifier.dart';
 import '../models/canal.dart';
 
 final canaisProvider = NotifierProvider<CanaisNotifier, List<Canal>>(
@@ -45,6 +47,20 @@ class CanaisNotifier extends Notifier<List<Canal>> {
     }
 
     ref.read(relayApiServiceProvider).toggleCanal(settings.ip, index).ignore();
+    _syncWidget();
+  }
+
+  // Salva estado dos canais no SharedPreferences para o widget Android ler.
+  Future<void> _syncWidget() async {
+    final consoles = ref.read(consolesProvider);
+    for (final canal in state) {
+      await HomeWidget.saveWidgetData('canal_ativo_${canal.index}', canal.ativo);
+      await HomeWidget.saveWidgetData(
+          'canal_nome_${canal.index}', consoles[canal.index]?.nome ?? '');
+    }
+    await HomeWidget.updateWidget(
+      androidName: 'RelayWidgetProvider',
+    );
   }
 
   // Ao mudar para modo único: mantém no máximo o primeiro canal ativo.

@@ -40,6 +40,7 @@ dependencies:
   speech_to_text: ^7.0.0
   multicast_dns: ^0.3.3
   flutter_native_splash: ^2.4.6
+  home_widget: ^0.9.1
 
 dev_dependencies:
   flutter_test:
