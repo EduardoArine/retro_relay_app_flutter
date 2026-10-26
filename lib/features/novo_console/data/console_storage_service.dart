@@ -3,15 +3,17 @@
 // Responsabilidades:
 //   - Serializar Map<int, ConsoleConfig> como lista JSON em uma única chave
 //   - Deserializar de volta ao carregar
-//   - Operações: loadAll, save(canal, config), remove(canal)
+//   - Operações: loadAll, saveAll
+//   - Flags de sincronização com o ESP32 (pendente / migrado)
 //
 // Formato no SharedPreferences (chave: AppConstants.prefsKeyConsoles):
 //   JSON string de List<PersistedConsole.toJson()>
 //   Exemplo: [{"canal":0,"nome":"Super Nintendo","imagem":"https://..."}]
+//   É o mesmo formato do endpoint /consoles do ESP32 (ver toJsonList/fromJsonList).
 //
 // O que NÃO fica aqui:
 //   - Validação de dados
-//   - Cópia de arquivos locais (fica em ConsoleRepository)
+//   - Regras de sincronização (ficam em ConsoleRepository)
 //   - Estado reativo
 
 import 'dart:convert';
@@ -40,36 +42,49 @@ class ConsoleStorageService {
     if (raw == null || raw.isEmpty) return {};
 
     try {
-      final list = jsonDecode(raw) as List<dynamic>;
-      return {
-        for (final item in list)
-          (item as Map<String, dynamic>)['canal'] as int:
-              PersistedConsole.fromJson(item).toConsoleConfig(),
-      };
+      return fromJsonList(jsonDecode(raw) as List<dynamic>);
     } catch (_) {
       return {};
     }
   }
 
-  /// Salva ou atualiza o console de um canal específico.
-  Future<void> save(int canal, ConsoleConfig config) async {
-    final current = loadAll();
-    current[canal] = config;
-    await _persist(current);
+  /// Substitui o cadastro inteiro.
+  Future<void> saveAll(Map<int, ConsoleConfig> consoles) async {
+    await _prefs.setString(
+      AppConstants.prefsKeyConsoles,
+      jsonEncode(toJsonList(consoles)),
+    );
   }
 
-  /// Remove o console de um canal. Não lança erro se o canal não existir.
-  Future<void> remove(int canal) async {
-    final current = loadAll();
-    if (!current.containsKey(canal)) return;
-    current.remove(canal);
-    await _persist(current);
+  /// true = há alterações locais que ainda não chegaram ao ESP32.
+  bool get pendente =>
+      _prefs.getBool(AppConstants.prefsKeyConsolesPendente) ?? false;
+
+  Future<void> setPendente(bool valor) =>
+      _prefs.setBool(AppConstants.prefsKeyConsolesPendente, valor);
+
+  /// true = já houve a primeira sincronização com o ESP32.
+  bool get migrado =>
+      _prefs.getBool(AppConstants.prefsKeyConsolesMigrado) ?? false;
+
+  Future<void> setMigrado() =>
+      _prefs.setBool(AppConstants.prefsKeyConsolesMigrado, true);
+
+  static List<Map<String, dynamic>> toJsonList(
+    Map<int, ConsoleConfig> consoles,
+  ) {
+    final canais = consoles.keys.toList()..sort();
+    return [
+      for (final canal in canais)
+        PersistedConsole.fromConsoleConfig(canal, consoles[canal]!).toJson(),
+    ];
   }
 
-  Future<void> _persist(Map<int, ConsoleConfig> consoles) async {
-    final list = consoles.entries
-        .map((e) => PersistedConsole.fromConsoleConfig(e.key, e.value).toJson())
-        .toList();
-    await _prefs.setString(AppConstants.prefsKeyConsoles, jsonEncode(list));
+  static Map<int, ConsoleConfig> fromJsonList(List<dynamic> list) {
+    return {
+      for (final item in list)
+        (item as Map<String, dynamic>)['canal'] as int:
+            PersistedConsole.fromJson(item).toConsoleConfig(),
+    };
   }
 }

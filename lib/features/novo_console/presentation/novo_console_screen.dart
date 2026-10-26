@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/network/network_exception.dart';
 import '../../../shared/widgets/header_bar_with_back.dart';
 import '../models/console_config.dart';
 import 'novo_console_notifier.dart';
@@ -37,10 +38,20 @@ class _NovoConsoleScreenState extends ConsumerState<NovoConsoleScreen> {
     final nome = _nomeController.text.trim();
     if (nome.isEmpty) return;
 
-    await ref.read(consolesProvider.notifier).save(
-          widget.canalIndex,
-          ConsoleConfig(nome: nome, imagem: _imagemSelecionada),
+    try {
+      await ref.read(consolesProvider.notifier).save(
+            widget.canalIndex,
+            ConsoleConfig(nome: nome, imagem: _imagemSelecionada),
+          );
+    } on NetworkException catch (e) {
+      // ESP32 recusou os dados — sem conexão não cai aqui (salva e envia depois)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Não foi possível salvar: ${e.message}')),
         );
+      }
+      return;
+    }
 
     if (mounted) Navigator.pop(context);
   }
@@ -59,6 +70,7 @@ class _NovoConsoleScreenState extends ConsumerState<NovoConsoleScreen> {
               hintText: 'Ex: Super Nintendo',
             ),
             textCapitalization: TextCapitalization.words,
+            maxLength: AppConstants.nomeConsoleMaxLength,
             onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 24),

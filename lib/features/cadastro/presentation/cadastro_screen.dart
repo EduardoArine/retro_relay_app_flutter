@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/network/network_exception.dart';
 import '../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../shared/widgets/app_header.dart';
 import '../../config/data/connectivity_provider.dart';
@@ -77,8 +78,17 @@ class CadastroScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmar == true) {
+    if (confirmar != true) return;
+
+    try {
       await ref.read(consolesProvider.notifier).remove(index);
+    } on NetworkException catch (e) {
+      // ESP32 recusou a alteração — sem conexão não cai aqui (remove e envia depois)
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Não foi possível remover: ${e.message}')),
+        );
+      }
     }
   }
 }

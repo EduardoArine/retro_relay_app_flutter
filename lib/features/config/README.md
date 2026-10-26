@@ -52,8 +52,9 @@ final prefs = ref.read(sharedPreferencesProvider);
 `MdnsService` (em `core/network/mdns_service.dart`) descobre o ESP32 na rede local.
 
 Estratégia em duas etapas:
-1. Resolve `retro-relay.local` via `IPAddressResourceRecord` (hostname direto)
-2. Fallback: busca serviços `_http._tcp` via `PtrResourceRecord` → `SrvResourceRecord` → IP
+1. Resolve `retrorelay.local` via `IPAddressResourceRecord` (hostname direto, `AppConstants.mdnsName`)
+2. Fallback: busca serviços `_http._tcp` via `PtrResourceRecord` → `SrvResourceRecord` → IP,
+   considerando só a instância `retrorelay._http._tcp.local` (ignora roteador, impressora etc.)
 
 O botão "Buscar na rede" em `ConfigScreen` chama `MdnsService.discover()`, preenche o
 campo IP e chama `_salvarIp()` automaticamente se encontrar.

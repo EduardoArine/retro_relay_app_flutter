@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:multicast_dns/multicast_dns.dart';
 
+import '../constants/app_constants.dart';
+
 final mdnsServiceProvider = Provider<MdnsService>((_) => MdnsService());
 
 class MdnsService {
@@ -8,7 +10,7 @@ class MdnsService {
   // Retorna o IP como string, ou null se não encontrado dentro do timeout.
   Future<String?> discover({
     String serviceType = '_http._tcp',
-    String hostname = 'retro-relay.local',
+    String hostname = '${AppConstants.mdnsName}.local',
     Duration timeout = const Duration(seconds: 5),
   }) async {
     final client = MDnsClient();
@@ -48,6 +50,11 @@ class MdnsService {
           in client.lookup<PtrResourceRecord>(
         ResourceRecordQuery.serverPointer(serviceType),
       ).timeout(timeout, onTimeout: (_) {})) {
+        // Ignora outros serviços HTTP da rede (roteador, impressora...).
+        // O firmware anuncia a instância como "retrorelay._http._tcp.local".
+        if (!ptr.domainName.toLowerCase().startsWith(AppConstants.mdnsName)) {
+          continue;
+        }
         await for (final srv
             in client.lookup<SrvResourceRecord>(
           ResourceRecordQuery.service(ptr.domainName),

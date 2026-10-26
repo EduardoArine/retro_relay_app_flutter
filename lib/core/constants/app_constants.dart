@@ -18,15 +18,31 @@ abstract final class AppConstants {
   /// Intervalo do polling de conectividade (em segundos).
   static const int connectivityPollSeconds = 15;
 
+  /// Nome anunciado pelo firmware via mDNS (MDNS.begin("retrorelay") → retrorelay.local).
+  static const String mdnsName = 'retrorelay';
+
   // ─── Endpoints ───────────────────────────────────────────────────────────
   static const String endpointPing = '/ping';
   static const String endpointToggle = '/ligar';
   static const String endpointMode = '/modo';
 
+  /// Cadastro de consoles salvo no ESP32 (GET lê, POST grava a lista inteira).
+  static const String endpointConsoles = '/consoles';
+
   // ─── SharedPreferences keys ──────────────────────────────────────────────
   static const String prefsKeyIp = 'ip_relay';
   static const String prefsKeyModoUnico = 'modo_unico';
   static const String prefsKeyConsoles = 'consoles_config';
+
+  /// true = cadastro alterado sem conexão, precisa ser enviado ao ESP32.
+  static const String prefsKeyConsolesPendente = 'consoles_pendente';
+
+  /// true = já houve a primeira sincronização com o ESP32.
+  static const String prefsKeyConsolesMigrado = 'consoles_migrado';
+
+  // ─── Consoles ────────────────────────────────────────────────────────────
+  /// Limite do nome do console (o firmware aceita até 96 bytes UTF-8).
+  static const int nomeConsoleMaxLength = 32;
 
   // ─── Canais ──────────────────────────────────────────────────────────────
   static const int totalCanais = 16;
