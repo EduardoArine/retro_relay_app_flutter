@@ -59,4 +59,10 @@ Estratégia em duas etapas:
 O botão "Buscar na rede" em `ConfigScreen` chama `MdnsService.discover()`, preenche o
 campo IP e chama `_salvarIp()` automaticamente se encontrar.
 
+**Redescoberta automática:** o `conectadoProvider` usa `VerificadorConexao`. Depois de
+`AppConstants.falhasAntesDeRedescobrir` pings seguidos sem resposta (IP pode ter mudado
+no DHCP do roteador), ele busca via mDNS — no máximo uma vez a cada
+`AppConstants.redescobertaIntervaloSeconds` — e, se o ESP32 responder no IP encontrado,
+salva o novo IP via `settingsProvider`.
+
 Timeout padrão: 5 s para hostname, 2 s por etapa do fallback.
