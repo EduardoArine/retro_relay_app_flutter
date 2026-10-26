@@ -35,6 +35,34 @@ class RelayApiService {
     }
   }
 
+  // Cadastro de consoles salvo no ESP32, compartilhado com a interface web.
+  // Formato: [{"canal": 0, "nome": "...", "imagem": "..."}]
+  Future<List<Map<String, dynamic>>> getConsoles(String ip) async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        'http://$ip${AppConstants.endpointConsoles}',
+      );
+      return (response.data ?? []).cast<Map<String, dynamic>>();
+    } on DioException catch (e) {
+      throw NetworkException.fromDioException(e);
+    }
+  }
+
+  // Substitui o cadastro inteiro no ESP32. O firmware valida e responde 400 se inválido.
+  Future<void> saveConsoles(
+    String ip,
+    List<Map<String, dynamic>> consoles,
+  ) async {
+    try {
+      await _dio.post(
+        'http://$ip${AppConstants.endpointConsoles}',
+        data: consoles,
+      );
+    } on DioException catch (e) {
+      throw NetworkException.fromDioException(e);
+    }
+  }
+
   // Retorna false sem lançar exceção — ausência de conexão é estado esperado.
   Future<bool> testarConexao(String ip) async {
     try {
