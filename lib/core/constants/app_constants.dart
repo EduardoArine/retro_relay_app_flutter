@@ -18,6 +18,12 @@ abstract final class AppConstants {
   /// Intervalo do polling de conectividade (em segundos).
   static const int connectivityPollSeconds = 15;
 
+  /// Pings seguidos sem resposta antes de procurar o ESP32 via mDNS (IP pode ter mudado).
+  static const int falhasAntesDeRedescobrir = 2;
+
+  /// Intervalo mínimo entre buscas mDNS automáticas (em segundos).
+  static const int redescobertaIntervaloSeconds = 60;
+
   /// Intervalo da leitura do estado dos relés com o app aberto (mesmo da interface web).
   static const int estadoPollSeconds = 5;
 
