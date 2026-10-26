@@ -35,6 +35,24 @@ class RelayApiService {
     }
   }
 
+  // Estado real dos relés: bit N de [estado] = canal N ligado.
+  // Firmware anterior ao /estado responde 404 (NetworkException com statusCode).
+  Future<({int estado, bool modoUnico})> getEstado(String ip) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        'http://$ip${AppConstants.endpointEstado}',
+      );
+      final data = response.data;
+      final estado = data?['estado'];
+      if (estado is! int) {
+        throw const NetworkException(message: 'Resposta inválida do servidor');
+      }
+      return (estado: estado, modoUnico: data!['modo'] != 'multi');
+    } on DioException catch (e) {
+      throw NetworkException.fromDioException(e);
+    }
+  }
+
   // Cadastro de consoles salvo no ESP32, compartilhado com a interface web.
   // Formato: [{"canal": 0, "nome": "...", "imagem": "..."}]
   Future<List<Map<String, dynamic>>> getConsoles(String ip) async {
