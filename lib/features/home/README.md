@@ -41,11 +41,22 @@ Canal(index: 0, nome: 'Super Nintendo', ativo: false)
 
 **Após toggle:** estado local atualizado imediatamente (otimista), chamada HTTP ao ESP32 em background.
 
+## Estado real dos relés (`GET /estado`)
+
+Os relés também mudam pela interface web do ESP32, pelo widget Android e por outros celulares. O `CanaisNotifier` lê o estado real (bitmask dos 16 canais + modo) e aplica na lista:
+
+- ao reconectar (inclusive logo após abrir o app) e ao voltar ao primeiro plano
+- a cada `AppConstants.estadoPollSeconds` (5 s) com o app aberto e conectado
+- após a resposta de cada toggle
+
+Enquanto houver toggle sem resposta, ou se as configurações mudarem durante a leitura, o resultado é descartado para não desfazer a atualização otimista. O modo do ESP32 é aplicado em `settingsProvider`. Firmware sem `/estado` (404): mantém o estado local.
+
 ## Dependências cross-feature (por provider — permitido pelas regras do projeto)
 
 | Provider externo | Feature de origem | Como é usado |
 |---|---|---|
-| `settingsProvider` | `config` | IP e modoUnico lidos via `ref.read` em cada toggle |
+| `settingsProvider` | `config` | IP e modoUnico lidos via `ref.read` em cada toggle; modo do ESP32 gravado via `save` |
+| `conectadoProvider` | `config` | Lê o estado real ao reconectar; polling só roda conectado |
 | `consolesProvider` | `novo_console` | Grid exibe imagem e nome de cada canal via `ref.watch` |
 
 Acesso direto a `data/` ou `models/` de outras features **não é permitido**.

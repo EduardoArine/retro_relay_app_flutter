@@ -18,6 +18,9 @@ abstract final class AppConstants {
   /// Intervalo do polling de conectividade (em segundos).
   static const int connectivityPollSeconds = 15;
 
+  /// Intervalo da leitura do estado dos relés com o app aberto (mesmo da interface web).
+  static const int estadoPollSeconds = 5;
+
   /// Nome anunciado pelo firmware via mDNS (MDNS.begin("retrorelay") → retrorelay.local).
   static const String mdnsName = 'retrorelay';
 
@@ -25,6 +28,9 @@ abstract final class AppConstants {
   static const String endpointPing = '/ping';
   static const String endpointToggle = '/ligar';
   static const String endpointMode = '/modo';
+
+  /// Estado real dos relés: {"estado": bitmask, "modo": "unico"|"multi", "versao": "..."}
+  static const String endpointEstado = '/estado';
 
   /// Cadastro de consoles salvo no ESP32 (GET lê, POST grava a lista inteira).
   static const String endpointConsoles = '/consoles';
