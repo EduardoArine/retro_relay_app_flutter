@@ -1,7 +1,9 @@
-// Grid 2 colunas de ConsoleCard.
+// Grade de ConsoleCard: 2 colunas no celular, mais colunas em telas largas
+// (cards de no mínimo 180 px, como a página do aparelho).
 //
 // Recebe a lista completa de canais e o mapa de configs.
 // Não sabe de onde vieram os dados — isso é responsabilidade da tela.
+// Não rola sozinha: fica dentro da lista da tela, abaixo do painel "Ligado agora".
 import 'package:flutter/material.dart';
 
 import '../../features/home/models/canal.dart';
@@ -22,21 +24,29 @@ class ConsoleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.9,
-      ),
-      itemCount: canais.length,
-      itemBuilder: (_, i) {
-        final canal = canais[i];
-        return ConsoleCard(
-          canal: canal,
-          config: consoles[canal.index],
-          onTap: () => onToggle(canal.index),
+    return LayoutBuilder(
+      builder: (_, restricoes) {
+        const espaco = 12.0;
+        final largura = restricoes.maxWidth;
+        final colunas = largura < 600 ? 2 : ((largura + espaco) / (180 + espaco)).floor();
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: colunas,
+            mainAxisSpacing: espaco,
+            crossAxisSpacing: espaco,
+            childAspectRatio: 0.82,
+          ),
+          itemCount: canais.length,
+          itemBuilder: (_, i) {
+            final canal = canais[i];
+            return ConsoleCard(
+              canal: canal,
+              config: consoles[canal.index],
+              onTap: () => onToggle(canal.index),
+            );
+          },
         );
       },
     );

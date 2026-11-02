@@ -1,17 +1,25 @@
-// Card de um canal de relé.
+// Card de um canal de relé, no visual da página do aparelho.
 //
 // Parâmetros:
 //   canal   — dados do canal (índice, nome, estado ativo)
 //   config  — configuração visual do console (null = slot vazio)
 //   onTap   — callback de toggle — quem chama decide o que fazer
 //
+// Mostra "CH 01", a imagem com halo, o nome e o estado escrito com LED
+// (LIGADO / DESLIGADO), para não depender só da cor.
+//
 // Não acessa providers — recebe tudo por parâmetro.
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../../app/theme.dart';
 import '../../features/home/models/canal.dart';
 import '../../features/novo_console/models/console_config.dart';
+import 'pixel_icon.dart';
+
+/// Rótulo do canal como na página: "CH 01" … "CH 16".
+String rotuloCanal(int index) => 'CH ${(index + 1).toString().padLeft(2, '0')}';
 
 class ConsoleCard extends StatelessWidget {
   final Canal canal;
@@ -27,80 +35,121 @@ class ConsoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isAtivo = canal.ativo;
+    final ativo = canal.ativo;
+    final nome = config?.nome.isNotEmpty == true ? config!.nome : 'Canal ${canal.index + 1}';
 
-    return GestureDetector(
-      onTap: onTap,
+    return Semantics(
+      button: true,
+      toggled: ativo,
+      label: '$nome, ${ativo ? 'ligado' : 'desligado'}',
+      excludeSemantics: true,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: isAtivo
-              ? colorScheme.primaryContainer.withValues(alpha: 0.3)
-              : colorScheme.surface,
+          color: ativo ? AppCores.painel : AppCores.superficie,
+          borderRadius: BorderRadius.circular(raio),
           border: Border.all(
-            color: isAtivo ? colorScheme.primary : colorScheme.outline,
-            width: isAtivo ? 2 : 1,
+            color: ativo ? AppCores.destaque : AppCores.borda,
+            width: ativo ? 2 : 1,
           ),
-          borderRadius: BorderRadius.circular(12),
+          boxShadow: ativo
+              ? const [BoxShadow(color: AppCores.brilho, blurRadius: 28, spreadRadius: -10, offset: Offset(0, 10))]
+              : const [],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: _buildImage(colorScheme),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
-              child: Text(
-                config?.nome.isNotEmpty == true
-                    ? config!.nome
-                    : 'Slot ${canal.index + 1}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: config?.nome.isNotEmpty == true
-                          ? colorScheme.onSurface
-                          : colorScheme.onSurface.withValues(alpha: 0.4),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(raio),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    rotuloCanal(canal.index),
+                    style: TextStyle(
+                      fontFamily: fontePixel,
+                      fontSize: 12,
+                      letterSpacing: 1,
+                      fontVariations: const [FontVariation.weight(500)],
+                      color: ativo ? AppCores.destaque : AppCores.apagado,
                     ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                  ),
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                      alignment: Alignment.center,
+                      // Halo atrás do pixel art: destaca os consoles pretos; laranja quando ligado
+                      decoration: BoxDecoration(
+                        gradient: RadialGradient(
+                          radius: 0.5,
+                          colors: ativo
+                              ? const [AppCores.brilho, Color(0x00F28C28)]
+                              : const [Color(0x1AF3E9D2), Color(0x00F3E9D2)],
+                        ),
+                      ),
+                      child: _imagem(),
+                    ),
+                  ),
+                  Text(
+                    nome,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 14, height: 1.3, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: ativo ? AppCores.ok : AppCores.ledApagado,
+                          boxShadow: ativo
+                              ? const [BoxShadow(color: AppCores.ok, blurRadius: 8)]
+                              : const [],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        ativo ? 'LIGADO' : 'DESLIGADO',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.1,
+                          color: ativo ? AppCores.ok : AppCores.apagado,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildImage(ColorScheme colorScheme) {
-    if (config == null || config!.imagem.isEmpty) {
-      return Icon(
-        Icons.videogame_asset_outlined,
-        size: 40,
-        color: colorScheme.onSurface.withValues(alpha: 0.2),
-      );
-    }
-
-    final errorWidget = Icon(
-      Icons.broken_image_outlined,
-      color: colorScheme.onSurface.withValues(alpha: 0.3),
-    );
+  Widget _imagem() {
+    const semImagem = PixelIcon(PixelIcone.console, size: 40, color: AppCores.bordaForte);
+    if (config == null || config!.imagem.isEmpty) return semImagem;
 
     if (config!.isLocalImage) {
       return Image.file(
         File(config!.imagem),
         fit: BoxFit.contain,
-        errorBuilder: (_, _, _) => errorWidget,
+        errorBuilder: (_, _, _) => semImagem,
       );
     }
 
     return Image.network(
       config!.imagem,
       fit: BoxFit.contain,
-      errorBuilder: (_, _, _) => errorWidget,
+      filterQuality: FilterQuality.none, // pixel art sem borrar
+      errorBuilder: (_, _, _) => semImagem,
     );
   }
 }
