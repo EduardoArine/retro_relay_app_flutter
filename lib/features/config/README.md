@@ -17,7 +17,7 @@ config/
     config_repository.dart  # Ponte entre PrefsService e os notifiers
     connectivity_provider.dart  # StreamProvider<bool> poll 15 s via /ping
   presentation/
-    config_screen.dart      # UI: campos IP, toggle modo, botão "Buscar na rede"
+    config_screen.dart      # UI (Ajustes): grupo Aparelho (estado da conexão, modo único) e grupo Conexão (IP, "Buscar")
     config_notifier.dart    # SettingsNotifier: carrega e salva AppSettings
 ```
 

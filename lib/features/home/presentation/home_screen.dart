@@ -15,6 +15,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/network/network_exception.dart';
 import '../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../shared/widgets/app_header.dart';
+import '../../../shared/widgets/borda_tracejada.dart';
 import '../../../shared/widgets/console_grid.dart';
 import '../../../shared/widgets/pixel_icon.dart';
 import '../../config/data/connectivity_provider.dart';
@@ -237,7 +238,7 @@ class _Vazio extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 16),
       child: CustomPaint(
-        painter: const _BordaTracejada(),
+        painter: const BordaTracejada(),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 32, 20, 32),
           child: Column(
@@ -271,30 +272,4 @@ class _Vazio extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Borda tracejada do estado vazio (a página usa border: dashed).
-class _BordaTracejada extends CustomPainter {
-  const _BordaTracejada();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppCores.bordaForte
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final caminho = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        (Offset.zero & size).deflate(0.5),
-        const Radius.circular(raio),
-      ));
-    for (final metrica in caminho.computeMetrics()) {
-      for (var d = 0.0; d < metrica.length; d += 9) {
-        canvas.drawPath(metrica.extractPath(d, d + 5), paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_BordaTracejada old) => false;
 }
