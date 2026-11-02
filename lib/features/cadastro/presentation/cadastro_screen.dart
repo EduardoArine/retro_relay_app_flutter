@@ -21,7 +21,7 @@ class CadastroScreen extends ConsumerWidget {
     final conectado = ref.watch(conectadoProvider).valueOrNull ?? false;
 
     return Scaffold(
-      appBar: const AppHeader(title: 'Cadastro'),
+      appBar: AppHeader(title: 'Cadastro', conectado: conectado),
       body: ListView.builder(
         itemCount: AppConstants.totalCanais,
         itemBuilder: (_, i) {
