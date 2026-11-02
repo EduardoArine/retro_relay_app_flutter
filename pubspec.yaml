@@ -63,6 +63,13 @@ flutter:
   assets:
     - assets/
 
+  # Fonte pixel dos títulos, a mesma da página do aparelho (SIL OFL, ver assets/fonts/OFL.txt).
+  # Arquivo variável: o peso vem de fontVariations no TextStyle.
+  fonts:
+    - family: PixelifySans
+      fonts:
+        - asset: assets/fonts/PixelifySans.ttf
+
 flutter_launcher_icons:
   android: true
   ios: false

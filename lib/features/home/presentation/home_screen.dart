@@ -24,6 +24,8 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppHeader(
         title: 'Retro Relay',
+        destaque: true,
+        conectado: conectado,
         showMicButton: true,
         onMicTap: () => Navigator.pushNamed(context, AppRoutes.voiceControl),
       ),

@@ -75,7 +75,7 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
     final conectado = ref.watch(conectadoProvider).valueOrNull ?? false;
 
     return Scaffold(
-      appBar: const AppHeader(title: 'Configurações'),
+      appBar: AppHeader(title: 'Ajustes', conectado: conectado),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
