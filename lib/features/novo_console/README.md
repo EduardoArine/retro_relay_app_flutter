@@ -43,7 +43,7 @@ novo_console/
     console_storage_service.dart  # Leitura/escrita JSON no SharedPreferences + flags de sync
     console_repository.dart       # getAll(), save(), remove(), sincronizar() — local + ESP32
   presentation/
-    novo_console_screen.dart  # UI: form nome + seletor de imagem
+    novo_console_screen.dart  # UI: form nome + grade de imagens (consoles e acessórios, nome sugerido pela imagem)
     novo_console_notifier.dart  # consolesProvider: estado, fila de operações e gatilhos de sync
 ```
 
@@ -70,3 +70,7 @@ Os consoles são salvos como uma lista JSON sob a chave `AppConstants.prefsKeyCo
 Quando o usuário escolher uma imagem da galeria, `ConsoleRepository` copiará o arquivo para `getApplicationDocumentsDirectory()` com nome `console_{timestamp}.jpg` e salvará o path absoluto em `ConsoleConfig.imagem`.
 
 A UI detecta imagem local por `ConsoleConfig.isLocalImage` (`!imagem.startsWith('http')`).
+
+## Escolha de imagem
+
+A grade usa o catálogo `AppConstants.imagensConsoles` e `AppConstants.imagensAcessorios`, a mesma lista e ordem da página do aparelho. Os arquivos ficam no repositório `retro-relay-images` (CDN). Escolher uma imagem preenche o nome sugerido enquanto o nome não tiver sido editado, como na página.
