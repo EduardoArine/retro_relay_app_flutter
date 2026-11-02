@@ -60,9 +60,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  assets:
-    - assets/
-
   # Fonte pixel dos títulos, a mesma da página do aparelho (SIL OFL, ver assets/fonts/OFL.txt).
   # Arquivo variável: o peso vem de fontVariations no TextStyle.
   fonts:
@@ -70,15 +67,30 @@ flutter:
       fonts:
         - asset: assets/fonts/PixelifySans.ttf
 
+# Ícone e splash: símbolo do Modo Campanha (o mesmo favicon da página do aparelho e do site),
+# gerado com design/source/brand/build-symbol.mjs do repositório modo-campanha.
+# assets/icone/ fica fora do bundle do app: só os geradores abaixo usam esses arquivos.
+# Para regerar: dart run flutter_launcher_icons && dart run flutter_native_splash:create
 flutter_launcher_icons:
   android: true
-  ios: false
-  image_path: "assets/app_icon.png"
+  ios: true
+  image_path: "assets/icone/app_icon.png"
+  # iOS não aceita transparência: fundo opaco com margem, como o apple-touch-icon
+  image_path_ios: "assets/icone/app_icon_ios.png"
+  remove_alpha_ios: true
+  # Android 8+: símbolo sobre o fundo do Modo Campanha, com margem para a máscara
+  adaptive_icon_background: "#1D1815"
+  adaptive_icon_foreground: "assets/icone/app_icon_adaptive.png"
   min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icone/app_icon.png"
+    background_color: "#14110F"
+    theme_color: "#14110F"
 
 flutter_native_splash:
-  color: "#171212"
-  image: assets/app_icon.png
+  color: "#14110F"
+  image: assets/icone/app_icon_adaptive.png
   android_12:
-    color: "#171212"
-    image: assets/app_icon.png
+    color: "#14110F"
+    image: assets/icone/splash_android12.png
