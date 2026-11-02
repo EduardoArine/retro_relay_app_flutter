@@ -13,7 +13,7 @@ home/
   models/
     canal.dart              # Canal(index, nome, ativo) — imutável
   presentation/
-    home_screen.dart        # UI: grid + bottom nav + botão mic
+    home_screen.dart        # UI: aviso offline + painel "Ligado agora" + grid + bottom nav + botão mic
     home_notifier.dart      # (Fase 3) CanaisNotifier: toggle logic + modo único
 ```
 
@@ -41,6 +41,10 @@ Canal(index: 0, nome: 'Super Nintendo', ativo: false)
 
 **Após toggle:** estado local atualizado imediatamente (otimista), chamada HTTP ao ESP32 em background.
 
+**Desligar tudo (`desligarTudo`):** botão do painel "Ligado agora". O firmware só alterna um canal por vez, então o notifier lê o estado e desliga o primeiro canal ligado até não sobrar nenhum (como a página do aparelho). A tela já mostra tudo desligado; sem conexão lança `NetworkException` e a tela avisa.
+
+**Sem conexão:** o painel e o grid ficam apagados e não respondem ao toque, com um aviso no topo.
+
 ## Estado real dos relés (`GET /estado`)
 
 Os relés também mudam pela interface web do ESP32, pelo widget Android e por outros celulares. O `CanaisNotifier` lê o estado real (bitmask dos 16 canais + modo) e aplica na lista:
@@ -55,7 +59,7 @@ Enquanto houver toggle sem resposta, ou se as configurações mudarem durante a 
 
 | Provider externo | Feature de origem | Como é usado |
 |---|---|---|
-| `settingsProvider` | `config` | IP e modoUnico lidos via `ref.read` em cada toggle; modo do ESP32 gravado via `save` |
+| `settingsProvider` | `config` | IP e modoUnico lidos via `ref.read` em cada toggle; modo do ESP32 gravado via `save`; a tela mostra o modo no painel |
 | `conectadoProvider` | `config` | Lê o estado real ao reconectar; polling só roda conectado |
 | `consolesProvider` | `novo_console` | Grid exibe imagem e nome de cada canal via `ref.watch` |
 

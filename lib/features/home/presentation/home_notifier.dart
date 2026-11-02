@@ -110,6 +110,33 @@ class CanaisNotifier extends Notifier<List<Canal>> {
     _syncWidget();
   }
 
+  /// Desliga todos os canais ligados (botão do painel "Ligado agora").
+  ///
+  /// O firmware só alterna um canal por vez: lê o estado e desliga o primeiro
+  /// ligado até não sobrar nenhum, como a página do aparelho. Lê de novo a cada
+  /// passo porque alguém pode ter ligado outro canal pela web no meio.
+  /// Lança [NetworkException] se o ESP32 não responder.
+  Future<void> desligarTudo() async {
+    if (!state.any((c) => c.ativo)) return;
+    final ip = ref.read(settingsProvider).ip;
+    final api = ref.read(relayApiServiceProvider);
+
+    state = [for (final c in state) c.copyWith(ativo: false)];
+    _syncWidget();
+    _togglesPendentes++;
+    try {
+      for (var passo = 0; passo < AppConstants.totalCanais; passo++) {
+        final estado = (await api.getEstado(ip)).estado;
+        if (estado == 0) break;
+        final primeiroLigado = (estado & -estado).bitLength - 1;
+        await api.toggleCanal(ip, primeiroLigado);
+      }
+    } finally {
+      _togglesPendentes--;
+      sincronizarEstado();
+    }
+  }
+
   /// Lê o estado real dos relés no ESP32 e aplica na lista de canais.
   /// Nunca lança: sem conexão ou com firmware anterior ao /estado, mantém o estado local.
   Future<void> sincronizarEstado() async {

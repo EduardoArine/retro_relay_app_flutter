@@ -21,6 +21,7 @@ class FakeRelayApi extends RelayApiService {
   bool modoUnico = true;
   NetworkException? erro;
   Completer<void>? toggleEmAndamento;
+  int? ultimoToggle;
 
   @override
   Future<({int estado, bool modoUnico})> getEstado(String ip) async {
@@ -30,6 +31,7 @@ class FakeRelayApi extends RelayApiService {
 
   @override
   Future<void> toggleCanal(String ip, int canal) {
+    ultimoToggle = canal;
     toggleEmAndamento = Completer<void>();
     return toggleEmAndamento!.future;
   }
@@ -109,6 +111,41 @@ void main() {
     api.estado = 1 << 5; // alguém ligou outro canal pela web
     await notifier.sincronizarEstado();
     expect(ativos(), [5]);
+  });
+
+  test('desligar tudo desliga canal a canal até não sobrar nenhum', () async {
+    final notifier = container.read(canaisProvider.notifier);
+    api.estado = (1 << 2) | (1 << 7) | (1 << 12);
+    await notifier.sincronizarEstado();
+    expect(ativos(), [2, 7, 12]);
+
+    final desligando = notifier.desligarTudo();
+    expect(ativos(), isEmpty, reason: 'a tela já mostra tudo desligado');
+    for (final canal in [2, 7, 12]) {
+      await pumpEventQueue();
+      expect(api.ultimoToggle, canal);
+      api.estado &= ~(1 << canal);
+      api.toggleEmAndamento!.complete();
+    }
+    await desligando;
+
+    expect(api.estado, 0);
+    expect(ativos(), isEmpty);
+  });
+
+  test('desligar tudo sem conexão lança e volta ao estado real', () async {
+    final notifier = container.read(canaisProvider.notifier);
+    api.estado = 1 << 4;
+    await notifier.sincronizarEstado();
+
+    api.erro = const NetworkException(message: 'Sem conexão');
+    await expectLater(notifier.desligarTudo(), throwsA(isA<NetworkException>()));
+    await pumpEventQueue(); // a leitura disparada pela falha termina (ainda sem conexão)
+
+    // A conexão volta: a próxima leitura mostra o que continua ligado de verdade
+    api.erro = null;
+    await notifier.sincronizarEstado();
+    expect(ativos(), [4]);
   });
 
   test('firmware sem /estado (404): mantém o estado local', () async {
